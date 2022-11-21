@@ -8,10 +8,11 @@ import { Web3Service } from '../Service/web3-service.service';
 })
 export class Web3HandlingComponent implements OnInit {
 
-  public account : any
-  public balance : any
-
-  direction: string[] | undefined;
+  public accInfo : any = {
+    accounts : [],
+    balance : ''
+  }
+  direction: any
   constructor(private web3: Web3Service) { }
 
   ngOnInit(): void {
@@ -27,12 +28,11 @@ export class Web3HandlingComponent implements OnInit {
   }
 
   async Info() {
-   this.account =  await this.web3.accountsList()
-   await console.log(this.account)
-    this.balance = await this.web3.accountInfo(this.account[0])
+    this.accInfo = await this.web3.accountInfo()
+    await console.log(this.accInfo)
   }
 
-  Disconnect(){
+  Disconnect() {
     this.web3.disconnectWallet()
   }
 }

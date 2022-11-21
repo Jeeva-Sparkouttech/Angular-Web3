@@ -1,45 +1,41 @@
 import { Injectable } from '@angular/core';
-import { Subject } from 'rxjs';
-
-  // Web3 Stuff | Dependencias de Web3
-
+import { Observable } from 'rxjs';
 import Web3 from 'web3';
 import Web3Modal from "web3modal";
 import WalletConnectProvider from "@walletconnect/web3-provider"; // this profile wallet handler 
 import { provider } from 'web3-core'; 
-
 
 @Injectable({
   providedIn: 'root'
 })
 
 export class Web3Service {
-  public accountsObservable = new Subject<string[]>();
-  web3Modal;
-  web3js:  any;
-  provider: provider | undefined;
-  accounts: string[] | undefined;
-  balance: string | undefined;
+  web3Modal: any;
+  web3:  any;
+  provider: provider | any;
+  public info : any = {
+    accounts : [],
+    balance : ''
+  }
 
   constructor() {
     const providerOptions = {
       walletconnect: {
-        package: WalletConnectProvider, // required | here whe import the package necessary to support wallets|| aqui importamos el paquete que nos ayudara a usar soportar distintas wallets
-        options: {
-          infuraId: 'env', // required change this with your own infura id | cambia esto con tu apikey de infura
-          // description: 'Scan the qr code and sign in', // You can change the desciption | Puedes camnbiar los textos descriptivos en la seccion description
-          // qrcodeModalOptions: {
-          //   mobileLinks: [
-          //     'rainbow',
-          //     'metamask',
-          //     'argent',
-          //     'trust',
-          //     'imtoken',
-          //     'pillar'
-          //   ]
-          // }
+        package: WalletConnectProvider, 
+         options: {
+          infuraId: "ba1fba8f482642f2a4734ab1d9c7112f",
+          qrcodeModalOptions: {
+            mobileLinks: [
+              'rainbow',
+              'metamask',
+              'argent',
+              'trust',
+              'imtoken',
+              'pillar'
+            ]
+          }
         }
-      },
+          },
       injected: {
         display: {
           logo: 'https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg',
@@ -51,39 +47,30 @@ export class Web3Service {
     };
 
     this.web3Modal = new Web3Modal({
-      network: "testnet", // optional change this with the net you want to use like rinkeby etc | puedes cambiar a una red de pruebas o etc
+     // network: "testnet", // optional change this with the net you want to use like rinkeby etc | puedes cambiar a una red de pruebas o etc
       cacheProvider: true, // optional
       providerOptions, // required
-    });
+    })
   }
 
-
   async connectAccount() {
-    this.provider = await this.web3Modal.connect(); // set provider
+     this.provider =await this.web3Modal.connect();
     console.log('====================================');
     console.log("provider",this.provider);
     console.log('====================================');
-    if (this.provider) {
-      this.web3js = new Web3(this.provider);
-    } // create web3 instance
-    this.accounts = await this.web3js.eth.getAccounts();
-    return this.accounts;
+    return true
   }
 
-  async accountInfo(account: any[]){
-    const initialvalue = await this.web3js.eth.getBalance(account);
-    this.balance = this.web3js.utils.fromWei(initialvalue , 'ether');
-    return this.balance;
-  }
+   async accountInfo(){
+    this.provider = await this.web3Modal.connect()
+    const web3 = await new Web3(this.provider);
 
- async accountsList() { 
-  this.provider = await this.web3Modal.connect(); // set provider
-  if (this.provider) {
-    this.web3js = new Web3(this.provider);
+    this.info.accounts =  await web3.eth.getAccounts();
+    let initialvalue : any =  await web3.eth.getBalance(this.info.accounts[0]);
+    this.info.balance = await web3.utils.fromWei(initialvalue , 'ether');
+    
+    return (this.info)
   }
-  const acc = await this.web3js.eth.getAccounts();
-  return acc
- }
 
 async disconnectWallet()  {
     await this.web3Modal.clearCachedProvider();

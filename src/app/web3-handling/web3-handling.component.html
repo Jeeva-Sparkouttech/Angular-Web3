@@ -2,6 +2,22 @@
 <button (click)="Info()">Info</button>
 <div>
     <h3>Account : {{accInfo.accounts}}</h3>
-    <h3>Balance : {{accInfo.balance}}</h3>
+    <h3>Native Balance : {{accInfo.balance}}</h3>
+    <h3>Token Balance : {{accInfo.tBalance}}</h3>
 </div>
-<button (click)="Disconnect()">Disconnect</button>
+<button (click)="Disconnect()">Disconnect</button> <br>
+<p>______________________________________________________</p>
+
+<h3>Transfer tokens</h3>
+<form [formGroup]="transferForm">
+    <div>
+        <label>recipient address</label>
+        <input formControlName="address" type="text">
+    </div>
+    <div>
+        <label>token amount</label>
+        <input formControlName="amount" type="text">
+    </div>
+    <button (click)="tranferToken()" type="submit">Transfer</button>
+</form>
+<p>-- {{response}}</p>

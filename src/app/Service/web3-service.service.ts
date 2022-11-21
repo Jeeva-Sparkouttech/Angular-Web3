@@ -4,6 +4,7 @@ import Web3 from 'web3';
 import Web3Modal from "web3modal";
 import WalletConnectProvider from "@walletconnect/web3-provider"; // this profile wallet handler 
 import { provider } from 'web3-core'; 
+import {abi,contract_address} from "../Helper/contract-abi"
 
 @Injectable({
   providedIn: 'root'
@@ -11,11 +12,13 @@ import { provider } from 'web3-core';
 
 export class Web3Service {
   web3Modal: any;
-  web3:  any;
+  //web3:  any;
   provider: provider | any;
+  contract : any 
   public info : any = {
     accounts : [],
-    balance : ''
+    balance : '',
+    tBalance : ''
   }
 
   constructor() {
@@ -53,6 +56,10 @@ export class Web3Service {
     })
   }
 
+  async ngOnInit(){
+    
+  }
+
   async connectAccount() {
      this.provider =await this.web3Modal.connect();
     console.log('====================================');
@@ -62,17 +69,31 @@ export class Web3Service {
   }
 
    async accountInfo(){
-    this.provider = await this.web3Modal.connect()
-    const web3 = await new Web3(this.provider);
-
+    this.provider =await this.web3Modal.connect();
+    const web3 = new  Web3( this.provider)
+    this.contract =await new web3.eth.Contract(abi,contract_address)
     this.info.accounts =  await web3.eth.getAccounts();
     let initialvalue : any =  await web3.eth.getBalance(this.info.accounts[0]);
     this.info.balance = await web3.utils.fromWei(initialvalue , 'ether');
-    
-    return (this.info)
+    this.info.tBalance = await this.contract.methods.balanceOf(this.info.accounts[0]).call()
+    return this.info
   }
 
-async disconnectWallet()  {
+async disconnectWallet() {
     await this.web3Modal.clearCachedProvider();
+}
+
+async transferTokenService(address : string , amount : number){
+  this.provider =await this.web3Modal.connect();
+  const web3 = new  Web3( this.provider)
+  console.log('====================================');
+  console.log("owner : ",this.info.accounts[0]);
+  console.log('====================================');
+  this.contract =await new web3.eth.Contract(abi,contract_address)
+  await this.contract.methods.transfer(address,amount).send({from :this.info.accounts[0]}).then((res:any)=>{
+    return res
+  }).catch((err:any)=>{
+    return err
+  })
 }
 }

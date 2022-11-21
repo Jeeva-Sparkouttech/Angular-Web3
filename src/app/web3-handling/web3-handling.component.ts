@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Web3Service } from '../Service/web3-service.service';
+import { FormBuilder,FormGroup,Validators} from '@angular/forms';
 
 @Component({
   selector: 'app-web3-handling',
@@ -10,14 +11,22 @@ export class Web3HandlingComponent implements OnInit {
 
   public accInfo : any = {
     accounts : [],
-    balance : ''
+    balance : '',
+    tBalance : ''
   }
-  direction: any
-  constructor(private web3: Web3Service) { }
+  direction : any
+  transferForm !: FormGroup
+  response : any
+
+  constructor(private web3: Web3Service,private formBuilder : FormBuilder) {
+   }
 
   ngOnInit(): void {
+    this.transferForm = this.formBuilder.group({
+      address : ['',Validators.required],
+      amount : ['',Validators.required]
+    })
   }
-
   Connect() {
     this.web3.connectAccount().then(response => {
       console.log(response);
@@ -34,5 +43,17 @@ export class Web3HandlingComponent implements OnInit {
 
   Disconnect() {
     this.web3.disconnectWallet()
+  }
+
+  tranferToken(){
+    if(this.transferForm.valid){
+      this.web3.transferTokenService(this.transferForm.value.address,this.transferForm.value.amount).then((res:any)=>{
+        this.response = res
+        console.log("response",this.response)
+      })
+    }
+    else{
+      this.response = "error: check form values"
+    }
   }
 }

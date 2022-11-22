@@ -27,16 +27,13 @@ export class Web3HandlingComponent implements OnInit {
       amount : ['',Validators.required]
     })
   }
-  Connect() {
-    this.web3.connectAccount().then(response => {
+  async Connect() {
+    await this.web3.connectAccount().then(response => {
       console.log(response);
       this.direction = response;
     }).catch((error: any) => {
       console.error(error);
     });
-  }
-
-  async Info() {
     this.accInfo = await this.web3.accountInfo()
     await console.log(this.accInfo)
   }
@@ -45,12 +42,10 @@ export class Web3HandlingComponent implements OnInit {
     this.web3.disconnectWallet()
   }
 
-  tranferToken(){
+  async tranferToken(){
     if(this.transferForm.valid){
-      this.web3.transferTokenService(this.transferForm.value.address,this.transferForm.value.amount).then((res:any)=>{
-        this.response = res
-        console.log("response",this.response)
-      })
+      let res = await this.web3.transferTokenService(this.transferForm.value.address,this.transferForm.value.amount)
+      this.response = res
     }
     else{
       this.response = "error: check form values"

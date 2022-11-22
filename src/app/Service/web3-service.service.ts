@@ -91,7 +91,10 @@ async transferTokenService(address : string , amount : number){
   console.log('====================================');
   this.contract =await new web3.eth.Contract(abi,contract_address)
   await this.contract.methods.transfer(address,amount).send({from :this.info.accounts[0]}).then((res:any)=>{
-    return res
+    console.log('====================================');
+    console.log("Transaction Hash in service",res.transactionHash);
+    console.log('====================================');
+    return res.transactionHash
   }).catch((err:any)=>{
     return err
   })

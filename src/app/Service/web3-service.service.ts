@@ -26,7 +26,10 @@ export class Web3Service {
       walletconnect: {
         package: WalletConnectProvider, 
          options: {
-          infuraId: "ba1fba8f482642f2a4734ab1d9c7112f",
+          rpc: {
+            97: "https://data-seed-prebsc-1-s1.binance.org:8545/",
+          },
+          network: "binance-testnet",
           qrcodeModalOptions: {
             mobileLinks: [
               'rainbow',
